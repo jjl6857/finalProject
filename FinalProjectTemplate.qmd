@@ -1,36 +1,73 @@
 ---
-title: "Your Project Title"
-author: "All Team Members' Names"
+title: "estimate future online player of No Man’s sky on Steam based on historical data from SteamDB"
+author: "jiaxi li & sifri zhou"
 format: pdf
 editor: visual
 ---
 
 ## Introduction
 
-A brief description of the motivations behind your project, the goal of your project, why it is interesting or important, and why machine learning is a reasonable approach.
+In this project, we explore the fascinating world of *No Man’s Sky*, an exploration and survival game that invites players to traverse an infinite procedurally generated universe. Our motivations behind this project stem from the game’s unique blend of creativity, exploration, and emergent gameplay. We aim to understand how pricing fluctuations impact the game’s online player base and why machine learning is a reasonable approach to analyze these dynamics.
 
+### Motivations:
+
+-   **Infinite Exploration**: *No Man’s Sky* offers an unparalleled sandbox experience where players can explore diverse planets, discover alien species, and unravel cosmic mysteries. The sheer scale of the universe ignites curiosity and drives our investigation.
+
+-   **Dynamic Player Base**: Understanding the ebb and flow of player engagement is crucial for game developers. We seek to uncover patterns related to pricing changes and their effects on player numbers.
+
+-   **Blockchain Economy**: The game’s player-driven economy, fueled by blockchain technology, adds an extra layer of complexity. We’re intrigued by how in-game resource prices influence player behavior.
+
+### Goal of the Project:
+
+Our primary goal is to analyze historical data related to *No Man’s Sky*—specifically, player counts and pricing trends. By doing so, we aim to answer questions such as:
+
+-   How do price reductions during sales events impact player engagement?
+
+-   Are there correlations between pricing changes and player activity?
+
+-   Can machine learning models predict player spikes based on pricing patterns?
 
 ## Illustration / Figure
 
 A figure or a diagram that illustrates the overall model or idea of your project. The idea is to make your report more accessible, especially to readers who are starting by skimming your work. For the project, taking a picture of a hand-drawn diagram is fine, as long as it's legible. PowerPoint is another option. You will not be penalized for hand-drawn illustrations -- you are graded on the design and illustrative power
 
+![](images/clipboard-2233500384.png)
 
 ## Background & Related Work (2 points)
 
-A description of 1-2 related work in the field, to provide reader a sense of what has already been done in this area, e.g. papers or existing products/software that do a related thing.
+*No Man’s Sky*, developed by Hello Games, is a groundbreaking exploration and survival game released in August 2016. Its defining feature is an infinite procedurally generated universe, where players can explore diverse planets, engage in space travel, and uncover cosmic mysteries. The game’s ambitious concept captured the attention of gamers worldwide, leading to high expectations and intense scrutiny during its launch.
 
--   2/2 Briefly describes 1-2 prior work related to your project to put your project into context. Your descriptions need not be complete, but should contain important work
--   1/2 Background that has omissions or factual incorrectness, but otherwise places your project into context.
--   0/1 Background contains too much information not related to your project, or has major omissions of content provided to you by your instructor or TA., or does not sufficiently put your project into context.
+### Omissions and Context
+
+While the game initially faced criticism due to missing features promised pre-launch, Hello Games continued to improve and expand *No Man’s Sky* through regular updates. These updates introduced new gameplay mechanics, enhanced graphics, and addressed community feedback. The game’s evolution highlights the importance of ongoing development and player engagement.
+
+## Related Work
+
+1.  **Procedural Generation in Games**:
+
+    -   *Spore* (2008): Developed by Maxis, *Spore* also employed procedural generation to create entire galaxies, planets, and creatures. It allowed players to evolve their species from single-celled organisms to space-faring civilizations.
+
+    -   *Elite Dangerous* (2014): Frontier Developments’ space simulation game features a vast, procedurally generated galaxy with realistic astronomical data. Players can explore, trade, and engage in combat across thousands of star systems.
+
+2.  **Economic Models in Virtual Worlds**:
+
+    -   *EVE Online* (2003): CCP Games’ massively multiplayer online game has a complex player-driven economy. Resources, ships, and even political power are traded among players. Economic decisions impact gameplay and alliances.
+
+    -   *Cryptocurrencies and NFTs*: The rise of blockchain technology has influenced virtual economies. Games like *Decentraland* and *Axie Infinity* use non-fungible tokens (NFTs) for in-game assets, creating novel economic models.
 
 ## Data Processing
 
-Describe the data that you have collected and cleaned. Be clear and specific when describing what you've done, so that a classmate can reproduce your work. Show some statistics and examples of your data.
+```{r}
+library(dplyr)
 
--   4/4 Clearly describes sources of data, and the steps you took to clean and format your data. Statistics and data example are well-chosen, and gives readers a "feel" for your data.
--   3/4 Mostly clear description, but some aspects of the data processing steps are vague. Statistics and data example are somewhat illustrative/helpful.
--   2/4 Vague description or missing key information about where your data comes from or what you did. No example data shown, or the ones shown are not illustrative.
--   1/4 Incomplete information.
+# Read the CSV files
+player_counts <- read.csv("chart_1.csv")
+price_history <- read.csv("chart_2.csv")
+
+# Convert date columns to proper date format
+player_counts$Date <- as.Date(player_counts$Date)
+price_history$Date <- as.Date(price_history$Date)
+```
 
 ## Architecture
 
@@ -40,16 +77,13 @@ A description of the final model. Do not describe all the intermediate models th
 
 Describe a simple, baseline model that you will compare your neural network against. This can be a simple model that you build.
 
-
 ## Quantitative Results
 
 A description of the quantitative measures of your result. What measurements can you use to illustrate how your model performs?
 
-
 ## Qualitative Results
 
 Include some sample outputs of your model, to help your readers better understand what your model can do. The qualitative results should also put your quantitative results into context (e.g. Why did your model perform well? Is there a type of input that the model does not do well on?)
-
 
 ## Discussion
 
@@ -61,10 +95,6 @@ Description of a use of the system that could give rise to ethical issues. Are t
 
 (Note that the expectations are higher here than in the project proposal.)
 
-
 ## Conclusion(Optional)
 
 Summarize the whole report.
-
-
-
