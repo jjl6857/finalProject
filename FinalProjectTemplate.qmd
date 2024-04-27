@@ -7,25 +7,26 @@ editor: visual
 
 ## Introduction
 
-In this project, we explore the fascinating world of *No Man’s Sky*, an exploration and survival game that invites players to traverse an infinite procedurally generated universe. Our motivations behind this project stem from the game’s unique blend of creativity, exploration, and emergent gameplay. We aim to understand how pricing fluctuations impact the game’s online player base and why machine learning is a reasonable approach to analyze these dynamics.
+In our project, we explore the extensive universe of "No Man's Sky," a game known for its exploration, survival elements, and blockchain-based economy. We focus on the game's unique characteristics that encourage continuous exploration and intricate player interactions. Our goal is to examine how changes in the game's price affect the number of online players and to evaluate the effectiveness of using machine learning to understand and forecast these trends.
 
 ### Motivations:
 
--   **Infinite Exploration**: *No Man’s Sky* offers an unparalleled sandbox experience where players can explore diverse planets, discover alien species, and unravel cosmic mysteries. The sheer scale of the universe ignites curiosity and drives our investigation.
+-   **Infinite Exploration:** "No Man's Sky" delivers a unique sandbox experience, where players can explore countless planets, meet different alien species, and uncover cosmic secrets. The game's limitless nature not only sparks player curiosity but also serves as an excellent focus for our research into how such an expansive environment affects player involvement and loyalty.
 
--   **Dynamic Player Base**: Understanding the ebb and flow of player engagement is crucial for game developers. We seek to uncover patterns related to pricing changes and their effects on player numbers.
+    **Dynamic Player Base:** It's important for game developers and marketers to understand changes in player engagement. We are keen to find trends connecting price adjustments to shifts in the number of players. Insights from this analysis could help in fine-tuning strategies to enhance player satisfaction and keep them engaged.
 
--   **Blockchain Economy**: The game’s player-driven economy, fueled by blockchain technology, adds an extra layer of complexity. We’re intrigued by how in-game resource prices influence player behavior.
+    **Blockchain Economy:** The use of blockchain technology brings additional complexity to the game's economy, affecting how resources are valued and exchanged. This feature could significantly influence player actions, making it an interesting point for thorough investigation.
 
 ### Goal of the Project:
 
-Our primary goal is to analyze historical data related to *No Man’s Sky*—specifically, player counts and pricing trends. By doing so, we aim to answer questions such as:
+\
+Our main goal is to analyze and understand the historical data of "No Man's Sky," particularly focusing on player numbers and pricing trends. This study will allow us to explore several important questions:
 
--   How do price reductions during sales events impact player engagement?
+**Impact of Price Reductions:** How do sales and promotional events affect how many players are active? Is there a clear link between these price cuts and increased player activity?
 
--   Are there correlations between pricing changes and player activity?
+**Pricing Dynamics and Player Activity:** How do changes in the game's price relate to the levels of player activity? Which trends are most effective in attracting new players or keeping current ones?
 
--   Can machine learning models predict player spikes based on pricing patterns?
+**Predictive Modeling:** Can machine learning models accurately forecast shifts in player activity based on observed pricing trends? Which methods and models provide the best accuracy and insights into player behaviors?
 
 ## Illustration / Figure
 
@@ -58,15 +59,51 @@ While the game initially faced criticism due to missing features promised pre-la
 ## Data Processing
 
 ```{r}
+packages <- c(
+"tibble",
+"dplyr",
+"readr",
+"tidyr",
+"purrr",
+"broom",
+"magrittr",
+"corrplot",
+"caret",
+"rpart",
+"rpart.plot",
+"e1071",
+"torch",
+"luz"
+)
+# renv::install(packages)
+sapply(packages, require, character.only=T)
+```
+
+```{r}
 library(dplyr)
 
 # Read the CSV files
-player_counts <- read.csv("chart_1.csv")
-price_history <- read.csv("chart_2.csv")
+player_counts <- read.csv("filtered_player.csv")
+price_history <- read.csv("filtered_price.csv")
 
-# Convert date columns to proper date format
-player_counts$Date <- as.Date(player_counts$Date)
-price_history$Date <- as.Date(price_history$Date)
+
+```
+
+```{r}
+head(player_counts)
+```
+
+```{r}
+head(price_history)
+```
+
+```{r}
+merged_data <- merge(player_counts, price_history, by = "DateTime", all = FALSE) 
+head(merged_data)
+```
+
+```{r}
+
 ```
 
 ## Architecture
@@ -79,22 +116,100 @@ Describe a simple, baseline model that you will compare your neural network agai
 
 ## Quantitative Results
 
+```{r}
+library(randomForest)
+library(Metrics)
+library(ggplot2)
+```
+
+## random forest
+
+```{r}
+merged_data$DateTime <- as.Date(merged_data$DateTime)
+set.seed(123) # For reproducibility
+training_indices <- sample(1:nrow(merged_data), nrow(merged_data) * 0.7)
+train_data <- merged_data[training_indices, ]
+test_data <- merged_data[-training_indices, ]
+
+# Build the baseline model (Linear Regression)
+baseline_model <- lm(Players ~ finalprice, data=train_data)
+baseline_pred <- predict(baseline_model, newdata=test_data)
+
+# Build the final model (Random Forest)
+final_model <- randomForest(Players ~ finalprice, data=train_data, ntree=500)
+final_pred <- predict(final_model, newdata=test_data)
+
+# Quantitative Results
+# Calculate MAE and R-squared for the baseline model
+baseline_mae <- mae(test_data$Players, baseline_pred)
+baseline_r_squared <- cor(test_data$Players, baseline_pred)^2
+
+# Calculate MAE and R-squared for the final model
+final_mae <- mae(test_data$Players, final_pred)
+final_r_squared <- cor(test_data$Players, final_pred)^2
+
+# Qualitative Results
+# Compare actual and predicted values
+qualitative_results <- data.frame(Actual=test_data$Players, Baseline_Predicted=baseline_pred, Final_Predicted=final_pred)
+head(qualitative_results)
+
+# Discussion
+# Here you would discuss the results, potentially including visualizations like:
+# A plot showing actual vs predicted player counts
+ggplot() +
+  geom_line(aes(x = test_data$DateTime, y = test_data$Players), color = 'blue') +
+  geom_line(aes(x = test_data$DateTime, y = final_pred), color = 'red') +
+  labs(title = "Actual vs Predicted Player Counts", x = "Date", y = "Player Count")
+
+```
+
+## Linear regression
+
+```{r}
+results <- cbind(test_data, Predicted = baseline_pred)
+
+ggplot(results, aes(x = DateTime, y = Players)) +
+  geom_line(aes(y = Predicted), color = 'red') +
+  geom_point(aes(y = Predicted), color = 'red') +
+  geom_line(color = 'blue') +
+  geom_point(color = 'blue') +
+  labs(title = "Actual vs Predicted Players Using Linear Regression",
+       x = "Date",
+       y = "Number of Players") +
+  theme_minimal()
+```
+
 A description of the quantitative measures of your result. What measurements can you use to illustrate how your model performs?
 
 ## Qualitative Results
+
+```{}
+```
 
 Include some sample outputs of your model, to help your readers better understand what your model can do. The qualitative results should also put your quantitative results into context (e.g. Why did your model perform well? Is there a type of input that the model does not do well on?)
 
 ## Discussion
 
+```{r}
+
+```
+
 Discuss your results. Do you think your model is performing well? Why or why not? What is unusual, surprising, or interesting about your results? What did you learn?
 
 ## Ethical Considerations
+
+```{r}
+
+```
 
 Description of a use of the system that could give rise to ethical issues. Are there limitations of your model? Your training data?
 
 (Note that the expectations are higher here than in the project proposal.)
 
 ## Conclusion(Optional)
+
+```{r}
+
+```
 
 Summarize the whole report.
